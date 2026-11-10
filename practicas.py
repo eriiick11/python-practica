@@ -201,58 +201,16 @@ def cambiar_dir(ruta: str):
         os.chdir(ruta_actual)
 
 #+================
-
-class CuentaBancaria:
-    def __init__(self, nombre: str, saldo: float=0) -> None:
-        self.nombre = nombre 
-        self._saldo = saldo
+@dataclass
+class Producto:
+    nombre: str
+    precio: float
+    cantidad: int
 
     @property
-    def saldo(self) -> float:         
-        return self._saldo
+    def total(self) -> float:
+        return self.precio * self.cantidad
 
-    def depositar(self, monto: float) -> None:
-        if monto <= 0:
-            raise ValueError("El monto debe ser mayor a 0")
-
-        self._saldo = self.saldo + monto
-    
-    def retirar(self, monto: float) -> None:
-        if  monto <= 0:
-            raise ValueError("El valor debe ser mayor a 0")
-
-        if monto > self._saldo:
-            raise ValueError("No tiene suficientes fondos")
-        self._saldo = self._saldo - monto 
-
-    def __repr__(self) -> str:
-        return f"CuentaBancaria({self.nombre}, {self._saldo})"
-
-    def transferir(self, destino: "CuentaBancaria", monto: float) -> None:
-        self.retirar(monto)
-        destino.depositar(monto)
-        
-
-
-a = CuentaBancaria("Ana", 100)
-b = CuentaBancaria("Luis", 50)
-
-a.depositar(50)
-print(a)                  # CuentaBancaria(Ana, 150)
-
-a.transferir(b, 30)
-print(a, b)               # CuentaBancaria(Ana, 120) CuentaBancaria(Luis, 80)
-
-try:
-    a.transferir(b, 500)
-except ValueError as e:
-    print("OK:", e)
-print(a, b)               # sin cambios: 120 y 80
-
-a.retirar(120)
-print(a)                  # CuentaBancaria(Ana, 0): retirar todo está permitido  # ValueError
-
-try:
-    a.saldo = 1000
-except AttributeError as e:
-    print("OK:", e)
+    def __post_init__(self):
+        if self.precio<0:
+            raise ValueError("El precio no puede ser 0")
